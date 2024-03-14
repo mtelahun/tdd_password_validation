@@ -21,6 +21,10 @@ impl ErrorList {
     pub fn new() -> Self {
         Self(Vec::new())
     }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
 }
 
 #[cfg(test)]
@@ -38,5 +42,6 @@ mod tests {
 
         // Assert
         assert_eq!(result, false, "given password length 7, then return false");
+        assert_eq!(errors.len(), 1, "Error list has 1 error");
     }
 }
