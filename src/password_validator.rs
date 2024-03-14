@@ -1,10 +1,8 @@
-#![allow(dead_code)]
+#[derive(Debug)]
+pub struct PasswordValidator {}
 
 #[derive(Debug)]
-struct PasswordValidator {}
-
-#[derive(Debug)]
-struct ErrorList(Vec<String>);
+pub struct ErrorList(Vec<String>);
 
 #[derive(Debug)]
 enum ReturnValue {
