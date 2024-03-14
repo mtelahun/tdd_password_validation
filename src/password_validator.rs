@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct PasswordValidator {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ErrorList(Vec<String>);
 
 #[derive(Debug)]
@@ -15,7 +15,7 @@ impl PasswordValidator {
         let mut valid = true;
         let mut err_list = ErrorList::new();
         let return_value_list = vec![
-            self.validate_length(password), 
+            self.validate_length(password),
             self.validate_2numbers(password),
             self.validate_1capital_letter(password),
             self.validate_1special_char(password),
@@ -26,10 +26,10 @@ impl PasswordValidator {
                 ReturnValue::Err(s) => {
                     valid = false;
                     err_list.0.push(s);
-                },
+                }
             }
         }
-        
+
         (valid, err_list)
     }
 
@@ -40,7 +40,7 @@ impl PasswordValidator {
         if password.len() < 8 {
             err = String::from("Password must be at least 8 characters");
 
-            return ReturnValue::Err(err)
+            return ReturnValue::Err(err);
         }
 
         ReturnValue::Ok
@@ -53,7 +53,7 @@ impl PasswordValidator {
         if password.chars().filter(|c| c.is_numeric()).count() < 2 {
             err = String::from("The password must contain at least 2 numbers");
 
-            return ReturnValue::Err(err)
+            return ReturnValue::Err(err);
         }
 
         ReturnValue::Ok
@@ -66,7 +66,7 @@ impl PasswordValidator {
         if password.chars().filter(|c| c.is_uppercase()).count() < 1 {
             err = String::from("password must contain at least one capital letter");
 
-            return ReturnValue::Err(err)
+            return ReturnValue::Err(err);
         }
 
         ReturnValue::Ok
@@ -76,10 +76,15 @@ impl PasswordValidator {
         let password = password.to_owned();
         #[allow(unused_assignments)]
         let mut err = String::new();
-        if password.chars().filter(|c| c.is_ascii_punctuation()).count() < 1 {
+        if password
+            .chars()
+            .filter(|c| c.is_ascii_punctuation())
+            .count()
+            < 1
+        {
             err = String::from("password must contain at least one special character");
 
-            return ReturnValue::Err(err)
+            return ReturnValue::Err(err);
         }
 
         ReturnValue::Ok
@@ -95,10 +100,14 @@ impl ErrorList {
         self.0.len()
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
     pub fn push(&mut self, err: String) {
         self.0.push(err)
     }
-    
+
     pub fn pop(&mut self) -> Option<String> {
         self.0.pop()
     }
@@ -121,7 +130,10 @@ mod tests {
         assert_eq!(result, false, "given password length 7, then return false");
         assert_eq!(errors.len(), 1, "Error list has 1 error");
         let mut errors = errors;
-        assert_eq!(errors.pop().unwrap(), String::from("Password must be at least 8 characters"));
+        assert_eq!(
+            errors.pop().unwrap(),
+            String::from("Password must be at least 8 characters")
+        );
     }
 
     #[test]
@@ -134,10 +146,16 @@ mod tests {
         let (result, errors) = validator.validate(pass);
 
         // Assert
-        assert_eq!(result, false, "given password with less than 1 number, then return false");
+        assert_eq!(
+            result, false,
+            "given password with less than 1 number, then return false"
+        );
         assert_eq!(errors.len(), 1, "Error list has 1 error");
         let mut errors = errors;
-        assert_eq!(errors.pop().unwrap(), String::from("The password must contain at least 2 numbers"));
+        assert_eq!(
+            errors.pop().unwrap(),
+            String::from("The password must contain at least 2 numbers")
+        );
     }
 
     #[test]
@@ -150,16 +168,19 @@ mod tests {
         let (result, errors) = validator.validate(pass);
 
         // Assert
-        assert_eq!(result, false, "given password with length < 8 and less than 2 numbers, then return false");
+        assert_eq!(
+            result, false,
+            "given password with length < 8 and less than 2 numbers, then return false"
+        );
         assert_eq!(errors.len(), 2, "there are 2 problems with the password");
         let mut errors = errors;
         assert_eq!(
-            errors.pop().unwrap(), 
+            errors.pop().unwrap(),
             String::from("The password must contain at least 2 numbers"),
             "error string: password must contain 2 numbers"
         );
         assert_eq!(
-            errors.pop().unwrap(), 
+            errors.pop().unwrap(),
             String::from("Password must be at least 8 characters"),
             "error string: password must be at least 8 chars"
         );
@@ -175,11 +196,16 @@ mod tests {
         let (result, errors) = validator.validate(pass);
 
         // Assert
-        assert_eq!(result, false, "given password with less than 1 capital letter, then return false");
+        assert_eq!(
+            result, false,
+            "given password with less than 1 capital letter, then return false"
+        );
         assert_eq!(errors.len(), 1, "Error list has 1 error");
         let mut errors = errors;
-        assert_eq!(errors.pop().unwrap(), String::from("password must contain at least one capital letter"));
-
+        assert_eq!(
+            errors.pop().unwrap(),
+            String::from("password must contain at least one capital letter")
+        );
     }
 
     #[test]
@@ -192,10 +218,15 @@ mod tests {
         let (result, errors) = validator.validate(pass);
 
         // Assert
-        assert_eq!(result, false, "given password with less than 1 special char, then return false");
+        assert_eq!(
+            result, false,
+            "given password with less than 1 special char, then return false"
+        );
         assert_eq!(errors.len(), 1, "Error list has 1 error");
         let mut errors = errors;
-        assert_eq!(errors.pop().unwrap(), String::from("password must contain at least one special character"));
-
+        assert_eq!(
+            errors.pop().unwrap(),
+            String::from("password must contain at least one special character")
+        );
     }
 }

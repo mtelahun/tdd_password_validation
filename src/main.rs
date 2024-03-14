@@ -18,13 +18,8 @@ fn main() {
     if status {
         println!("OK");
     } else {
-        loop {
-            if let Some(err) = err_list.pop() {
-                println!("{err}");
-            } else {
-                break;
-            }
+        while let Some(err) = err_list.pop() {
+            println!("{err}");
         }
-        
     }
 }
