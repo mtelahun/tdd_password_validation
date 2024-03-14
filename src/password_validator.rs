@@ -4,21 +4,55 @@ struct PasswordValidator {}
 #[derive(Debug)]
 struct ErrorList(Vec<String>);
 
+#[derive(Debug)]
+enum ReturnValue {
+    Ok,
+    Err(String),
+}
+
 impl PasswordValidator {
     pub fn validate(&self, password: &str) -> (bool, ErrorList) {
-        let password = password.to_owned();
         let mut valid = true;
         let mut err_list = ErrorList::new();
-
-        if password.len() < 8 {
-            valid = false;
-            err_list.0.push(String::from("Password must be at least 8 characters"));
-        } else if password.chars().filter(|c| c.is_numeric()).count() < 2 {
-            valid = false;
-            err_list.0.push(String::from("The password must contain at least 2 numbers"));
+        let return_value_list = vec![
+            self.validate_length(password), 
+            self.validate_2numbers(password)
+        ];
+        for value in return_value_list {
+            match value {
+                ReturnValue::Ok => (),
+                ReturnValue::Err(s) => {
+                    valid = false;
+                    err_list.0.push(s);
+                },
+            }
         }
         
         (valid, err_list)
+    }
+
+    fn validate_length(&self, password: &str) -> ReturnValue {
+        let password = password.to_owned();
+        let mut err = String::new();
+        if password.len() < 8 {
+            err = String::from("Password must be at least 8 characters");
+
+            return ReturnValue::Err(err)
+        }
+
+        ReturnValue::Ok
+    }
+
+    fn validate_2numbers(&self, password: &str) -> ReturnValue {
+        let password = password.to_owned();
+        let mut err = String::new();
+        if password.chars().filter(|c| c.is_numeric()).count() < 2 {
+            err = String::from("The password must contain at least 2 numbers");
+
+            return ReturnValue::Err(err)
+        }
+
+        ReturnValue::Ok
     }
 }
 
@@ -29,6 +63,10 @@ impl ErrorList {
 
     pub fn len(&self) -> usize {
         self.0.len()
+    }
+
+    pub fn push(&mut self, err: String) {
+        self.0.push(err)
     }
     
     pub fn pop(&mut self) -> Option<String> {
