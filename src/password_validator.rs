@@ -18,7 +18,8 @@ impl PasswordValidator {
         let mut err_list = ErrorList::new();
         let return_value_list = vec![
             self.validate_length(password), 
-            self.validate_2numbers(password)
+            self.validate_2numbers(password),
+            self.validate_1capital_letter(password),
         ];
         for value in return_value_list {
             match value {
@@ -58,6 +59,19 @@ impl PasswordValidator {
 
         ReturnValue::Ok
     }
+
+    fn validate_1capital_letter(&self, password: &str) -> ReturnValue {
+        let password = password.to_owned();
+        #[allow(unused_assignments)]
+        let mut err = String::new();
+        if password.chars().filter(|c| c.is_uppercase()).count() < 1 {
+            err = String::from("password must contain at least one capital letter");
+
+            return ReturnValue::Err(err)
+        }
+
+        ReturnValue::Ok
+    }
 }
 
 impl ErrorList {
@@ -85,7 +99,7 @@ mod tests {
     #[test]
     fn given_password_when_length_less_than_8_chars_then_error() {
         // Arrange
-        let pass = "1234567";
+        let pass = "A234567";
         let validator = PasswordValidator {};
 
         // Act
@@ -101,7 +115,7 @@ mod tests {
     #[test]
     fn given_password_when_less_than_2_numbers_then_error() {
         // Arrange
-        let pass = "abcdefg1";
+        let pass = "Abcdefg1";
         let validator = PasswordValidator {};
 
         // Act
@@ -117,15 +131,16 @@ mod tests {
     #[test]
     fn given_password_with_multiple_errors_then_show_multiple_error_messages() {
         // Arrange
-        let pass = "abc1";
+        let pass = "Abc1";
         let validator = PasswordValidator {};
 
         // Act
-        let (result, mut errors) = validator.validate(pass);
+        let (result, errors) = validator.validate(pass);
 
         // Assert
         assert_eq!(result, false, "given password with length < 8 and less than 2 numbers, then return false");
         assert_eq!(errors.len(), 2, "there are 2 problems with the password");
+        let mut errors = errors;
         assert_eq!(
             errors.pop().unwrap(), 
             String::from("The password must contain at least 2 numbers"),
@@ -136,5 +151,22 @@ mod tests {
             String::from("Password must be at least 8 characters"),
             "error string: password must be at least 8 chars"
         );
+    }
+
+    #[test]
+    fn password_with_less_than_1_capital_letter_must_fail() {
+        // Arrange
+        let pass = "abcdefg12";
+        let validator = PasswordValidator {};
+
+        // Act
+        let (result, errors) = validator.validate(pass);
+
+        // Assert
+        assert_eq!(result, false, "given password with less than 1 capital letter, then return false");
+        assert_eq!(errors.len(), 1, "Error list has 1 error");
+        let mut errors = errors;
+        assert_eq!(errors.pop().unwrap(), String::from("password must contain at least one capital letter"));
+
     }
 }
