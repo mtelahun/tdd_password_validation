@@ -8,3 +8,7 @@ Create a function that can be used as a validator for the password field of a us
 
 1. The password must be at least 8 characters long. If it is not met, then the following error message should be returned: “Password must be at least 8 characters”
 2. The password must contain at least 2 numbers. If it is not met, then the following error message should be returned: “The password must contain at least 2 numbers”
+3. The validation function should handle multiple validation errors.
+
+    For example, “somepas” should [show] an error message: “Password must be at least 8 characters\nThe password must contain at least 2 numbers”
+
